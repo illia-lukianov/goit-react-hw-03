@@ -1,0 +1,16 @@
+body {
+  background-color: rgb(0, 0, 0);
+  background-image: url("./images/ислп.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#root {
+  margin: 0 auto;
+  padding: 2em;
+  max-width: 1440px;
+}
+
+p {
+  margin: 0;
+}
