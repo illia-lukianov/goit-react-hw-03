@@ -1,45 +1,57 @@
-import { useState, useEffect } from 'react'
-import Description from '../Description/Description'
+import { useEffect, useState } from 'react'
+import ContactForm from '../ContactForm/ContactForm'
+import ContactList from '../ContactList/ContactList'
+import SearchBox from '../SearchBox/SearchBox'
 import style from './App.module.css'
-import Options from '../Options/Options'
-import Feedback from '../Feedback/Feedback'
-import Notification from '../Notification/Notification'
+
 
 export default function App() {
 
-  const [feedback, setFeedback] = useState(() => {
-    const initFeedback = window.localStorage.getItem('feedback');
-    return initFeedback
-      ? JSON.parse(initFeedback)
-      : { good: 0, neutral: 0, bad: 0 };
-  })
+  const initialData = [
+    {id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
+    {id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
+    {id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
+    {id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
+  ]
 
-  useEffect(() => {
-    localStorage.setItem("feedback", JSON.stringify(feedback))
-  }, [feedback])
-  
-
-  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
-  const positiveFeedback = totalFeedback > 0 ? Math.round((feedback.good / totalFeedback) * 100): 0;
-  
-  
-  function updateFeedback(feedbackType) {
-    if (feedbackType === "reset") {
-      setFeedback({ good: 0, neutral: 0, bad: 0 });
+  const [phoneData, setPhoneNumber] = useState(() => {
+    const data = localStorage.getItem("numberData")
+    if (data!==null&& data.length>0) {
+      return JSON.parse(data)
     } else {
-      setFeedback(currentFeedback => {
-        return {
-          ...currentFeedback,
-          [feedbackType]: currentFeedback[feedbackType] + 1,
-        }
-      })
+      return initialData
     }
+  })
+  
+  const [filter, setFilter] = useState('')
+  
+  const handleFilterChange = (value) => {
+    setFilter(value)
   }
   
-    return (
-    <div className = {style.contentWrapper}>
-      < Description />
-      < Options setStatistic={updateFeedback} totalFeedback={totalFeedback} />
-      {totalFeedback > 0 ? < Feedback feedback={feedback} totalStatistic={totalFeedback} positiveStatistic={positiveFeedback} /> : <Notification/>}
-    </div>
-  )}
+  const visibilityPhoneData = phoneData.filter((phone) => phone.name.toLowerCase().includes(filter.toLowerCase()))
+  
+  const addNumber = (newData) => {
+    setPhoneNumber((prevData) => [
+      ...prevData,
+      newData,
+    ])}
+
+  const removeNumber = (numberId) => {
+    setPhoneNumber((prevNumbers) => {return prevNumbers.filter((number) => number.id !== numberId)})
+  }
+  
+  useEffect(() => {
+    localStorage.setItem("numberData", JSON.stringify(phoneData))
+  }, [phoneData])
+  
+
+  return (
+  <div>
+    <h1>Phonebook</h1>
+      <ContactForm addNumber={addNumber} />
+      <SearchBox value={filter} onFilter={handleFilterChange} />
+      <ContactList phoneData={visibilityPhoneData} removeNumber={removeNumber} />
+  </div>
+  )
+}
